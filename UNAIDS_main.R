@@ -21,6 +21,8 @@ resultsDir <- file.path(baseDir, "results")
 
 
 # Load data
+df_aidsinfovsihme <- read.csv('data/IHMEvAIDSINFO.csv')
+
 df_ihme <- read.csv('data/IHME_HIVAIDS_SPENDING_2000_2017_Y2020M04D23.CSV')
 GHED_data <- read_excel("data/GHED_data.XLSX", sheet = "Data")
 df_other <- read.csv('data/Data_Nov_15_join.csv')
@@ -99,19 +101,46 @@ mean_GAE_share_by_year_joined_UMI <- leftJoinDf %>%
 
 
 # Regression Model
-model <- lm(lnTHE ~ year, df_small )
+
+  model <- lm(df_aidsinfovsihme_clean$TAEpcase_IHME ~ df_aidsinfovsihme_clean$GAEShare_ihme + df_aidsinfovsihme_clean$Year + df_aidsinfovsihme_clean$World.Bank.Status + df_aidsinfovsihme_clean$PWH )
 summary(model)
 
 
+model <- lm(df_aidsinfovsihme_clean$ProgressARTCov1019 ~ df_aidsinfovsihme_clean$TAEpcase_IHME + df_aidsinfovsihme_clean$GAEShare_ihme + df_aidsinfovsihme_clean$PWH + df_aidsinfovsihme_clean$World.Bank.Status)
+summary(model)
 
-#Visualization
-ESF_Analysis_March27 %>%
+model <- lm(df_aidsinfovsihme_clean$ProgressARTCov1019 ~ df_aidsinfovsihme_clean$Progress_Inc_Redux_NumCases)
+              summary(model)
+# Load data
+df_aidsinfovsihme <- read.csv('data/IHMEvAIDSINFO.csv')
+df_aidsinfovsihme_clean <- df_aidsinfovsihme %>%
+  filter(DropMissError == 0)
+
+# Plot Progress Dimensions
+df_aidsinfovsihme_clean %>%
+  ggplot(aes(x=ProgressIncDECLINE, y=ProgressARTCov1019)) +
+  geom_point(shape=1) +    # Use hollow circles
+  geom_smooth(method=lm )  # Add linear regression line 
+
+# plot TAE ihme vs aidsinfo
+df_aidsinfovsihme_clean %>%
   ggplot(aes(x=TAE, y=TAE_IHME)) +
   geom_point(shape=1) +    # Use hollow circles
   geom_smooth(method=lm ) +  # Add linear regression line 
   scale_x_continuous(trans='log10') +
   scale_y_continuous(trans='log10') + 
-  annotation_logticks()  
+  annotation_logticks() 
+
+# plot TAEpcase ihme vs. aidsinfo
+df_aidsinfovsihme_clean %>%
+  ggplot(aes(x=TAEpcase, y=TAEpcase_IHME)) +
+  geom_point(shape=1) +    # Use hollow circles
+  geom_smooth(method=lm ) +  # Add linear regression line 
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10') + 
+  annotation_logticks() 
+
+ 
   
 ggplot(df_small, aes(x = GAE_share, color = year)) + geom_histogram(color="darkblue", fill="lightblue")
 
@@ -133,4 +162,4 @@ write.csv(meanGAEout,"meanGAEout.csv", row.names = FALSE)
 write.csv(TAE_by_year,"TAEout.csv", row.names = FALSE)
 write.csv(GAE_by_year,"GAEout.csv", row.names = FALSE)
 write.csv(DAH_by_year,"DAHout.csv", row.names = FALSE)
-write.csv(ESF_Analysis_March27,"IHMEvAIDSINFO.csv", row.names = FALSE)
+write.csv(ESF_Analysis_March27,"data/IHMEvAIDSINFO.csv", row.names = FALSE)
