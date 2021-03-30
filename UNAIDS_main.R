@@ -105,7 +105,14 @@ summary(model)
 
 
 #Visualization
-
+ESF_Analysis_March27 %>%
+  ggplot(aes(x=TAE, y=TAE_IHME)) +
+  geom_point(shape=1) +    # Use hollow circles
+  geom_smooth(method=lm ) +  # Add linear regression line 
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10') + 
+  annotation_logticks()  
+  
 ggplot(df_small, aes(x = GAE_share, color = year)) + geom_histogram(color="darkblue", fill="lightblue")
 
 ggplot(data=mean_GAE_share_by_year, aes(x=year, y=mean_GAE_share, group=1)) +
